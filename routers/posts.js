@@ -9,11 +9,15 @@ const { data } = require('../validations/posts.js');
 
 const { slugParams } = require('../validations/generic.js');
 
+const access = require('../middlewares/access.js');
+
 router.use('/:slug', validator(slugParams));
 
 router.get('/', index);
 
 router.get('/:slug', show);
+
+router.use(access);
 
 router.post('/', validator(data), create);
 
