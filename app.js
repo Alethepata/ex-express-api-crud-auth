@@ -4,6 +4,8 @@ const port = process.env.PORT || 3000;
 const express = require('express');
 const app = express();
 
+const routerAuth = require('./routers/auth.js');
+
 const routerPost = require('./routers/posts.js');
 
 const routerTags = require('./routers/tags.js');
@@ -17,6 +19,8 @@ const serverError = require('./middlewares/serverError.js');
 const badRequest = require('./middlewares/badRequest.js');
 
 app.use(express.json());
+
+app.use('/auth', routerAuth);
 
 app.use('/posts', routerPost);
 
