@@ -37,6 +37,11 @@ const index = async (req, res, next) => {
                     select: {
                         name:true
                     }
+                },
+                user: {
+                    select: {
+                        name:true
+                    }
                 }
             }
         });
@@ -64,6 +69,11 @@ const show = async (req, res, next) => {
                     select: {
                         name:true
                     }
+                },
+                user: {
+                    select: {
+                        name:true
+                    }
                 }
             }
         })
@@ -78,7 +88,7 @@ const show = async (req, res, next) => {
 
 const create = async (req, res, next) => {
     try {
-        const { title, image, content, published, tags, categoryId } = req.body;
+        const { title, image, content, published, tags, categoryId, userId } = req.body;
     
         const posts = await prisma.post.findMany();
     
@@ -98,6 +108,10 @@ const create = async (req, res, next) => {
             data.categoryId = categoryId
         }
 
+        if (userId) {
+            data.userId = userId
+        }
+
         const post = await prisma.post.create({
             data,
             include: {
@@ -110,7 +124,13 @@ const create = async (req, res, next) => {
                 select: {
                     name:true
                 }
+                },
+            user: {
+                select: {
+                    name:true
+                }
             }
+            
         }});
         
         res.status(200).json(post)
@@ -124,7 +144,7 @@ const update = async (req, res, next) => {
     try {
         const { slug } = req.params;
 
-        const { title, image, content, published, tags, categoryId } = req.body;
+        const { title, image, content, published, tags, categoryId, userId } = req.body;
      
         const data = {
             title: title.trim(),
@@ -141,6 +161,10 @@ const update = async (req, res, next) => {
             data.categoryId = categoryId
         }
 
+        if (userId) {
+            data.userId = userId
+        }
+
         const post = await prisma.post.update({
             where: {
                 slug: slug,
@@ -153,6 +177,11 @@ const update = async (req, res, next) => {
                     }
                 },
                 category: {
+                    select: {
+                        name:true
+                    }
+                },
+                user: {
                     select: {
                         name:true
                     }
