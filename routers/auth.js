@@ -3,8 +3,12 @@ const router = express.Router();
 
 const { register, login } = require('../controllers/controllerAuth');
 
-router.post('/register', register);
+const validator = require('../middlewares/validator.js');
 
-router.post('/login', login);
+const { dataRegister, dataLogin } = require('../validations/auth.js');
+
+router.post('/register', validator(dataRegister), register);
+
+router.post('/login', validator(dataLogin), login);
 
 module.exports = router;
