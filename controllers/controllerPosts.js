@@ -88,10 +88,16 @@ const show = async (req, res, next) => {
 
 const create = async (req, res, next) => {
     try {
-        const { title, image, content, published, tags, categoryId, userId } = req.body;
+        const { title, image, content, published, tags, categoryId } = req.body;
     
         const posts = await prisma.post.findMany();
-    
+
+        const user = await prisma.user.findUnique({
+            where: {
+                email: req.user.email
+            }
+        })
+
         const data = {
             title: title.trim(),
             slug:createSlug(title, posts),
@@ -100,16 +106,13 @@ const create = async (req, res, next) => {
             published,
             tags: {
                 connect : tags.map(id=> ({id}))
-            }
+            },
+            userId: user.id,
     
         }
 
         if (categoryId) {
             data.categoryId = categoryId
-        }
-
-        if (userId) {
-            data.userId = userId
         }
 
         const post = await prisma.post.create({
@@ -144,8 +147,8 @@ const update = async (req, res, next) => {
     try {
         const { slug } = req.params;
 
-        const { title, image, content, published, tags, categoryId, userId } = req.body;
-     
+        const { title, image, content, published, tags, categoryId } = req.body;
+
         const data = {
             title: title.trim(),
             image,
@@ -161,13 +164,16 @@ const update = async (req, res, next) => {
             data.categoryId = categoryId
         }
 
-        if (userId) {
-            data.userId = userId
-        }
+        const user = await prisma.user.findUnique({
+            where: {
+                email: req.user.email
+            }
+        })
 
         const post = await prisma.post.update({
             where: {
                 slug: slug,
+                userId:user.id
             },
             data,
             include: {
@@ -201,7 +207,16 @@ const destroy = async (req, res, next) => {
 
     const { slug } = req.params;
 
+    
     try {
+        const user = await prisma.user.findUnique({
+            where: {
+                email: req.user.email,
+                userId: user.id
+    
+            }
+        })
+
         const post = await prisma.post.delete({
             where: {
                 slug: slug
